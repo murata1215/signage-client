@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!--
+    サイネージプレーヤー オーバーレイUI
+
+    目的:
+      BrowserView の上に重ねて表示するオーバーレイ。
+      ステータスバー（コンテンツ名・残り秒数）と
+      フェード切替用の黒背景レイヤーを提供する。
+
+    構成:
+      - フェードオーバーレイ: コンテンツ切替時に黒画面でフェードイン/アウト
+      - ステータスバー: 現在表示中のコンテンツ名とカウントダウン
+      - Sキーでステータスバーの表示/非表示を切替
+
+    注意:
+      このHTMLは BrowserWindow ではなく、overlayView（BrowserView）に
+      読み込まれる。背景は透明で、コンテンツ用 BrowserView の上に重なる。
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サイネージ オーバーレイ</title>
+  <link rel="stylesheet" href="css/overlay.css">
+</head>
+<body>
+
+  <!--
+    フェードオーバーレイ
+    コンテンツ切替時にこのレイヤーを黒にフェードイン → 切替 → フェードアウト
+    通常時は透明（pointer-events: none でクリックを透過）
+  -->
+  <div id="fade-overlay" class="fade-overlay"></div>
+
+  <!--
+    ステータスバー（画面下部）
+    現在のコンテンツ名と残り秒数を表示する。
+    Sキーで表示/非表示を切替可能。
+  -->
+  <div id="status-bar" class="status-bar">
+    <span id="status-name">起動中...</span>
+    <span id="status-timer">--</span>
+  </div>
+
+  <script src="js/overlay.js"></script>
+
+</body>
+</html>

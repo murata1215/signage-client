@@ -1,0 +1,171 @@
+/**
+ * 初回セットアップ画面用スタイルシート
+ *
+ * 目的:
+ *   初回起動時のサーバー接続設定フォームのスタイル定義。
+ *   ダーク系テーマで、サイネージ端末の画面に映える見た目にする。
+ *   overlayView 上に表示されるため、背景は不透明。
+ */
+
+/* === リセット === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === html/body: ダーク背景、中央配置 === */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1a2e;  /* ダークネイビー */
+  font-family: 'Segoe UI', sans-serif;
+  color: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === セットアップコンテナ: フォーム全体の枠 === */
+.setup-container {
+  width: 480px;
+  background: #16213e;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* === ヘッダー === */
+.setup-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.setup-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.setup-description {
+  font-size: 13px;
+  color: #8e8ea0;
+  line-height: 1.5;
+}
+
+/* === フォームグループ === */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b0b0c0;
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: #0f3460;
+  border: 1px solid #2a4a7f;
+  border-radius: 6px;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #5089c6;
+  box-shadow: 0 0 0 2px rgba(80, 137, 198, 0.2);
+}
+
+.form-group input::placeholder {
+  color: #4a5568;
+}
+
+.form-hint {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* === ボタン群 === */
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 接続テストボタン */
+.btn-secondary {
+  background: #2a4a7f;
+  color: #c0d0e0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #345a9f;
+}
+
+/* 保存して開始ボタン */
+.btn-primary {
+  background: #2ecc71;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #27ae60;
+}
+
+/* === テスト結果表示エリア === */
+.result-area {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 成功時のスタイル */
+.result-area.success {
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  color: #2ecc71;
+}
+
+/* 失敗時のスタイル */
+.result-area.error {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+}
+
+/* 処理中のスタイル */
+.result-area.loading {
+  background: rgba(52, 152, 219, 0.15);
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  color: #3498db;
+}

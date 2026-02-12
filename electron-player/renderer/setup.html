@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!--
+    初回セットアップ画面
+
+    目的:
+      signage-client の初回起動時（config.json が存在しない場合）に表示される。
+      管理者がサーバーURLとクライアントキーを入力し、接続テストを行ったうえで
+      設定を保存してコンテンツ再生を開始するためのフォーム。
+
+    表示タイミング:
+      config.json が存在しない場合に、overlayView に読み込まれる。
+      セットアップ完了後は index.html（通常のオーバーレイ）に切り替わる。
+
+    IPC通信:
+      - signageAPI.testConnection(serverUrl, clientKey) → メインプロセスに接続テスト依頼
+      - signageAPI.onTestConnectionResult(callback) → テスト結果を受信
+      - signageAPI.saveConfig(config) → 設定をメインプロセスに保存依頼
+      - signageAPI.onConfigSaved(callback) → 保存完了通知を受信
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サイネージクライアント 初期設定</title>
+  <link rel="stylesheet" href="css/setup.css">
+</head>
+<body>
+
+  <div class="setup-container">
+    <!-- ヘッダー -->
+    <div class="setup-header">
+      <h1>サイネージクライアント 初期設定</h1>
+      <p class="setup-description">
+        管理画面で登録された端末情報を入力してください。
+      </p>
+    </div>
+
+    <!-- 設定フォーム -->
+    <div class="setup-form">
+      <!-- サーバーURL入力 -->
+      <div class="form-group">
+        <label for="server-url">サーバー URL</label>
+        <input
+          type="text"
+          id="server-url"
+          placeholder="http://192.168.1.100:3000"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <div class="form-hint">signage-server のアドレスとポートを入力</div>
+      </div>
+
+      <!-- クライアントキー入力 -->
+      <div class="form-group">
+        <label for="client-key">Client Key</label>
+        <input
+          type="text"
+          id="client-key"
+          placeholder="550e8400-e29b-41d4-a716-446655440000"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <div class="form-hint">管理画面の端末管理で生成された UUID を入力</div>
+      </div>
+
+      <!-- ボタン群 -->
+      <div class="button-group">
+        <button id="btn-test" class="btn btn-secondary">接続テスト</button>
+        <button id="btn-save" class="btn btn-primary" disabled>保存して開始</button>
+      </div>
+
+      <!-- テスト結果表示エリア -->
+      <div id="result-area" class="result-area" style="display: none;">
+        <span id="result-icon"></span>
+        <span id="result-message"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/setup.js"></script>
+
+</body>
+</html>

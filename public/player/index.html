@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!--
+    サイネージプレーヤー PoC（プロトタイプ）
+
+    目的:
+      固定の2つのURLを交互にフルスクリーンで表示する。
+      サイネージシステムの実現可能性を検証するための最小構成。
+
+    表示コンテンツ:
+      1. Yahoo! JAPAN (https://www.yahoo.co.jp) - プロキシ経由
+      2. 社内サイネージ (http://10.20.249.224/aisignage/gnewsxgeminiapi/index.html) - 直接接続
+
+    操作方法:
+      - Sキー: ステータスバーの表示/非表示を切替
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>サイネージプレーヤー</title>
+
+  <!-- フルスクリーン表示用スタイル -->
+  <link rel="stylesheet" href="css/player.css">
+</head>
+<body>
+
+  <!--
+    コンテンツ表示エリア
+    2つのiframeを交互に使い、フェードアニメーションで切替える。
+    iframe-a: 最初に表示されるiframe
+    iframe-b: 裏で次のコンテンツを読み込むiframe
+  -->
+  <iframe id="iframe-a" class="player-iframe active"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          allowfullscreen>
+  </iframe>
+  <iframe id="iframe-b" class="player-iframe hidden"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          allowfullscreen>
+  </iframe>
+
+  <!--
+    ステータスバー（画面下部）
+    現在表示中のコンテンツ名と残り秒数を表示する。
+    デバッグ・動作確認用。Sキーで表示/非表示を切替可能。
+  -->
+  <div id="status-bar" class="status-bar">
+    <span id="status-name">読み込み中...</span>
+    <span id="status-timer">--</span>
+  </div>
+
+  <!-- プレーヤーロジック -->
+  <script src="js/player.js"></script>
+
+</body>
+</html>

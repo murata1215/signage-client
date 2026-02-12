@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!--
+    時間帯外 待機画面
+
+    目的:
+      再生時間帯外（play_start_time 〜 play_end_time の範囲外）に表示する画面。
+      黒背景に現在時刻を表示し、再生開始時刻を案内する。
+
+    表示タイミング:
+      ScheduleManager の isWithinPlayTime() が false を返した場合、
+      ViewManager.showStandby() によって contentView に読み込まれる。
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>待機中</title>
+  <style>
+    /* === リセット === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* === 黒背景、中央配置 === */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Segoe UI', sans-serif;
+      color: #666;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* === 時計表示 === */
+    .clock {
+      font-size: 72px;
+      font-weight: 300;
+      color: #333;
+      letter-spacing: 4px;
+    }
+
+    /* === メッセージ === */
+    .message {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 現在時刻を表示（毎秒更新） -->
+  <div id="clock" class="clock">--:--</div>
+
+  <!-- 案内メッセージ -->
+  <div class="message">再生時間帯外です</div>
+
+  <script>
+    /**
+     * 時計表示を毎秒更新する
+     *
+     * 現在時刻を HH:MM:SS 形式で表示。
+     * 待機画面が表示されている間、リアルタイムで更新される。
+     */
+    const clockEl = document.getElementById('clock');
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      clockEl.textContent = `${h}:${m}:${s}`;
+    }
+
+    // 初回更新 + 1秒間隔で更新
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+
+</body>
+</html>

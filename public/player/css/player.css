@@ -1,0 +1,101 @@
+/**
+ * サイネージプレーヤー用スタイルシート
+ *
+ * 目的:
+ *   フルスクリーンでコンテンツを表示するためのスタイル定義。
+ *   余白・スクロールバー・ブラウザUIを完全に排除し、
+ *   コンテンツが画面全体を占有するようにする。
+ */
+
+/* === リセット: 全要素の余白を除去 === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* === html/body: フルスクリーン表示の基盤 === */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;          /* スクロールバーを完全に非表示 */
+  background-color: #000;   /* コンテンツ切替時の背景を黒に */
+  font-family: sans-serif;
+}
+
+/* === コンテンツ表示用iframe: 画面全体を占有 === */
+.player-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;              /* iframeの枠線を除去 */
+}
+
+/* === iframe 切替時のフェードアニメーション === */
+/* 表示中のiframe */
+.player-iframe.active {
+  opacity: 1;
+  z-index: 2;               /* 前面に表示 */
+  transition: opacity 0.8s ease-in-out;
+}
+
+/* 非表示のiframe（次のコンテンツを裏で読み込み） */
+.player-iframe.hidden {
+  opacity: 0;
+  z-index: 1;               /* 背面で待機 */
+  transition: opacity 0.8s ease-in-out;
+}
+
+/* === ステータスバー: 現在の表示情報（デバッグ用） === */
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 12px;
+  line-height: 32px;
+  padding: 0 16px;
+  z-index: 100;              /* 最前面に表示 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: opacity 0.3s;
+}
+
+/* ステータスバー非表示時 */
+.status-bar.hidden {
+  opacity: 0;
+  pointer-events: none;     /* 非表示時はクリックを無効化 */
+}
+
+/* === 待機画面: 営業時間外やエラー時に表示 === */
+.waiting-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  color: #fff;
+}
+
+.waiting-screen h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+  color: #e0e0e0;
+}
+
+.waiting-screen p {
+  font-size: 1.2em;
+  color: #aaa;
+}

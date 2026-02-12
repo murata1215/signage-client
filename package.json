@@ -1,0 +1,15 @@
+{
+  "name": "signage-client",
+  "version": "0.1.0",
+  "description": "デジタルサイネージ Electron プレーヤー PoC",
+  "main": "electron-player/main.js",
+  "scripts": {
+    "start": "electron electron-player/main.js --no-sandbox",
+    "start:kiosk": "electron electron-player/main.js --no-sandbox --kiosk",
+    "start:dev": "electron electron-player/main.js --no-sandbox --dev"
+  },
+  "dependencies": {
+    "electron": "^33.0.0",
+    "pdfjs-dist": "^5.4.624"
+  }
+}
