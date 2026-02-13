@@ -33,8 +33,9 @@
 
 'use strict';
 
-const { app, BrowserWindow, globalShortcut, session, ipcMain } = require('electron');
+const { app, BrowserWindow, globalShortcut, session, ipcMain, protocol, net } = require('electron');
 const path = require('path');
+const { pathToFileURL } = require('url');
 
 // --- 自作モジュールの読み込み ---
 const ViewManager = require('./lib/view-manager');
@@ -336,6 +337,37 @@ function registerSetupHandlers() {
 }
 
 // =====================================================
+// カスタムプロトコル登録（pdfapp://）
+// =====================================================
+
+/**
+ * pdfapp:// カスタムプロトコルをスキーム登録する
+ *
+ * file:// プロトコルでは ESM（.mjs）の動的 import がブロックされるため、
+ * HTTP と同等の権限を持つカスタムプロトコルを使用して PDF ビューア関連の
+ * ファイルを配信する。
+ *
+ * 重要: この呼び出しは app.whenReady() の前に行う必要がある（Electron の仕様）
+ *
+ * 権限設定:
+ *   - standard: 標準的なスキーム（相対パスの解決が有効）
+ *   - secure: HTTPS と同等のセキュリティコンテキスト
+ *   - supportFetchAPI: fetch() API でアクセス可能
+ *   - stream: ストリーミング対応
+ */
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'pdfapp',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true
+    }
+  }
+]);
+
+// =====================================================
 // アプリケーション起動シーケンス
 // =====================================================
 
@@ -344,14 +376,28 @@ app.whenReady().then(async () => {
     // 1. プロキシ設定
     await setupProxy();
 
-    // 2. メインウィンドウ作成
+    // 2. pdfapp:// プロトコルハンドラを登録
+    //    pdfapp://local/path/to/file → ローカルファイルを返す
+    //    これにより file:// の代わりに ESM import が可能になる
+    protocol.handle('pdfapp', (request) => {
+      // pdfapp://local/path/to/file → /path/to/file にマッピング
+      const url = new URL(request.url);
+      // ホスト名 "local" を除去し、パス部分をデコードしてローカルファイルパスを取得
+      const filePath = decodeURIComponent(url.pathname);
+      const fileUrl = pathToFileURL(filePath).href;
+      console.log(`[protocol] pdfapp:// リクエスト: ${request.url} → ${fileUrl}`);
+      return net.fetch(fileUrl);
+    });
+    console.log('[main] pdfapp:// プロトコルハンドラ登録完了');
+
+    // 3. メインウィンドウ作成
     const win = createMainWindow();
 
-    // 3. ViewManager 初期化
+    // 4. ViewManager 初期化
     viewManager = new ViewManager(win);
     await viewManager.initialize();
 
-    // 4. BrowserView の before-input-event にもキーハンドラを登録
+    // 5. BrowserView の before-input-event にもキーハンドラを登録
     // （BrowserView がフォーカスを持つと、ウィンドウの before-input-event が発火しないため）
     const views = win.getBrowserViews();
     views.forEach((view) => {
@@ -360,13 +406,13 @@ app.whenReady().then(async () => {
       });
     });
 
-    // 5. キーボードショートカット登録
+    // 6. キーボードショートカット登録
     registerShortcuts(win);
 
-    // 6. セットアップ画面用の IPC ハンドラを登録
+    // 7. セットアップ画面用の IPC ハンドラを登録
     registerSetupHandlers();
 
-    // 7. config.json を読み込み
+    // 8. config.json を読み込み
     const config = configManager.loadConfig();
 
     if (!config) {

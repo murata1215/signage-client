@@ -44,7 +44,8 @@ AskUserQuestion ツールは使用しないでください（DevRelay 経由で�
 - **Electron プレーヤー（サーバー連携済み）**: 完了・動作確認済み（`electron-player/`）
   - サーバーからのスケジュール取得・ポーリング
   - ハートビート送信
-  - PDF コンテンツ表示（PDF.js）
+  - PDF コンテンツ表示（PDF.js + pdfapp:// カスタムプロトコル）
+  - 日本語フォント対応（CMap 設定済み）
   - 初回セットアップ画面
   - 再生時間帯外の待機画面
   - キャッシュ管理（オフラインフォールバック）
@@ -121,6 +122,15 @@ HTTPS_PROXY=http://210.175.128.100:8080 HTTP_PROXY=http://210.175.128.100:8080 n
 ### User-Agent 設定
 - Electron のデフォルト UA には `Electron/xxx` が含まれる
 - ヨドバシ等のボット検知サイトでブロックされるため、Chrome UA を `setUserAgent()` で設定済み
+
+### PDF 表示（pdfapp:// カスタムプロトコル）
+- `file://` プロトコルでは ESM（.mjs）の動的 import がブロックされるため、`pdfapp://` カスタムプロトコルを使用
+- `protocol.registerSchemesAsPrivileged()` は `app.whenReady()` の **前** に呼ぶ必要がある
+- `protocol.handle('pdfapp', ...)` で `pdfapp://local/絶対パス` → `file:///絶対パス` に変換
+- pdfjs-dist は **v4.x 系**（v4.10.38）を使用。v5.x は `Uint8Array.prototype.toHex()` を使い、Electron 33（Chromium 130）では未対応
+- 日本語フォント表示には `getDocument()` に `cMapUrl`（cmaps/）と `cMapPacked: true` の設定が必須
+- `standardFontDataUrl`（standard_fonts/）も指定して標準フォントの代替表示に対応
+- Worker パスは `window.location.href`（pdf-viewer.html）基準で `../..` がプロジェクトルート
 
 ### コンテンツ先読み（プリロード）戦略
 - `_showContent()`: コンテンツ表示直後に次のコンテンツをスタンバイ View に先読み開始

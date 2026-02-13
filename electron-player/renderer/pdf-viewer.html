@@ -6,7 +6,7 @@
 
     目的:
       PDF.js を使用して PDF ファイルをスライドショー形式で表示する。
-      BrowserView の loadURL で file:// プロトコルとして読み込まれ、
+      BrowserView の loadURL で pdfapp:// カスタムプロトコルとして読み込まれ、
       URL パラメータで PDF ファイルパスとページ表示秒数を受け取る。
 
     URL パラメータ:
@@ -41,11 +41,10 @@
 
   <!--
     PDF.js ライブラリの読み込み
-    pdfjs-dist npm パッケージから直接参照する。
-    Electron の BrowserView 内で動作するため、
-    Node.js の require は使えず script タグで読み込む。
+    pdfjs-dist v5.x は ESM（.mjs）のみ提供。
+    pdf-viewer.js 内で動的 import するため、ここでは pdf.mjs を直接読み込まない。
+    pdf-viewer.js を type="module" で読み込み、内部で import() する。
   -->
-  <script src="../../node_modules/pdfjs-dist/build/pdf.mjs" type="module"></script>
   <script src="js/pdf-viewer.js" type="module"></script>
 
 </body>

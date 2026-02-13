@@ -149,8 +149,12 @@ class ScheduleManager extends EventEmitter {
 
     // 新しい PDF をダウンロード
     const pdfItems = scheduleData.playlist.filter((item) => item.type === 'pdf');
+    console.log(`[schedule] PDF コンテンツ数: ${pdfItems.length}`);
     for (const item of pdfItems) {
-      if (!cacheManager.isPdfCached(item.content_id)) {
+      const isCached = cacheManager.isPdfCached(item.content_id);
+      const cachePath = cacheManager.getPdfCachePath(item.content_id);
+      console.log(`[schedule] PDF キャッシュ確認: contentId=${item.content_id}, name="${item.name}", キャッシュ済み=${isCached}, パス=${cachePath}`);
+      if (!isCached) {
         await cacheManager.downloadAndCachePdf(this.serverUrl, this.clientKey, item.content_id);
       }
     }
@@ -209,9 +213,12 @@ class ScheduleManager extends EventEmitter {
         };
       } else if (item.type === 'pdf') {
         // --- PDF コンテンツ ---
-        // PDF ビューア HTML にクエリパラメータでファイルパスとページ表示秒数を渡す
+        // pdfapp:// カスタムプロトコルで PDF ビューア HTML を配信する。
+        // file:// プロトコルでは ESM（.mjs）の動的 import がブロックされるため、
+        // カスタムプロトコルを使用して HTTP と同等のセキュリティコンテキストで読み込む。
+        // クエリパラメータで PDF ファイルパスとページ表示秒数を渡す。
         const pdfCachePath = cacheManager.getPdfCachePath(item.content_id);
-        const pdfViewerUrl = `file://${this.pdfViewerPath}?file=${encodeURIComponent(pdfCachePath)}&pageDuration=${item.pdf_page_duration || 10}`;
+        const pdfViewerUrl = `pdfapp://local${this.pdfViewerPath}?file=${encodeURIComponent(pdfCachePath)}&pageDuration=${item.pdf_page_duration || 10}`;
 
         return {
           name: item.name,
@@ -331,8 +338,12 @@ class ScheduleManager extends EventEmitter {
 
       // PDF コンテンツをダウンロード
       const pdfItems = scheduleData.playlist.filter((item) => item.type === 'pdf');
+      console.log(`[schedule] 初回ロード: PDF コンテンツ数=${pdfItems.length}`);
       for (const item of pdfItems) {
-        if (!cacheManager.isPdfCached(item.content_id)) {
+        const isCached = cacheManager.isPdfCached(item.content_id);
+        const cachePath = cacheManager.getPdfCachePath(item.content_id);
+        console.log(`[schedule] PDF キャッシュ確認: contentId=${item.content_id}, name="${item.name}", キャッシュ済み=${isCached}, パス=${cachePath}`);
+        if (!isCached) {
           await cacheManager.downloadAndCachePdf(this.serverUrl, this.clientKey, item.content_id);
         }
       }

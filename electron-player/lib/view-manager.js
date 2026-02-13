@@ -112,7 +112,8 @@ class ViewManager {
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,
-        sandbox: false    // コンテンツの自由な読み込みを許可
+        sandbox: false,       // コンテンツの自由な読み込みを許可
+        webSecurity: false    // file:// プロトコルでの ESM import（PDF.js）を許可
       }
     });
 
@@ -121,7 +122,8 @@ class ViewManager {
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,
-        sandbox: false
+        sandbox: false,
+        webSecurity: false    // file:// プロトコルでの ESM import（PDF.js）を許可
       }
     });
 
