@@ -54,10 +54,38 @@ if [ ! -d "${PROJECT_DIR}/node_modules/electron" ]; then
 fi
 
 echo "[start-electron] プロジェクトディレクトリ: ${PROJECT_DIR}"
+
+# --- ディスプレイ解像度を検出してスケールファクターを決定 ---
+# 4K（横幅2560以上）ディスプレイの場合、コンテンツが小さく表示されるのを防ぐため
+# Chromium の --force-device-scale-factor=2 で2倍スケーリングを適用する。
+# フルHD（1920×1080）以下では スケーリングなし（デフォルト1倍）。
+# xrandr が使えない環境（Wayland等）では検出をスキップし、スケーリングなしで起動する。
+SCALE_FACTOR=""
+if command -v xrandr &>/dev/null; then
+  # プライマリディスプレイの現在の解像度を取得（例: "3840x2160"）
+  RESOLUTION=$(xrandr 2>/dev/null | grep ' connected primary' | grep -oP '\d+x\d+' | head -1)
+  if [ -n "$RESOLUTION" ]; then
+    # 横幅を抽出して判定
+    WIDTH=$(echo "$RESOLUTION" | cut -d'x' -f1)
+    echo "[start-electron] ディスプレイ解像度: ${RESOLUTION}"
+    if [ "$WIDTH" -ge 2560 ]; then
+      SCALE_FACTOR="--force-device-scale-factor=2"
+      echo "[start-electron] 高解像度ディスプレイ検出 → スケールファクター 2x を適用"
+    else
+      echo "[start-electron] 標準解像度ディスプレイ → スケーリングなし"
+    fi
+  else
+    echo "[start-electron] プライマリディスプレイの解像度を検出できませんでした"
+  fi
+else
+  echo "[start-electron] xrandr が見つかりません（Wayland環境？）→ スケーリングなし"
+fi
+
 echo "[start-electron] Electron プレーヤーを起動します..."
 
 # --- Electron アプリを起動 ---
+# SCALE_FACTOR: 高解像度ディスプレイ時のみ --force-device-scale-factor=2 が設定される
 cd "${PROJECT_DIR}"
-npx electron electron-player/main.js --no-sandbox ${MODE}
+npx electron electron-player/main.js --no-sandbox ${SCALE_FACTOR} ${MODE}
 
 echo "[start-electron] Electron プレーヤーが終了しました"

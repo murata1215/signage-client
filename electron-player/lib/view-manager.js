@@ -151,6 +151,12 @@ class ViewManager {
     this.mainWindow.addBrowserView(this.contentViewB);
     this.mainWindow.addBrowserView(this.overlayView);
 
+    // コンテンツViewの背景を黒に設定
+    // 横幅いっぱいに表示しないサイト（Yahoo等）の場合、余白部分から
+    // 背後のスタンバイView（前のコンテンツ）が見えてしまう問題を防止する
+    this.contentViewA.setBackgroundColor('#000000');
+    this.contentViewB.setBackgroundColor('#000000');
+
     // 全Viewをフルスクリーンサイズに設定
     this._resizeAllViews();
 
@@ -158,6 +164,18 @@ class ViewManager {
     this.mainWindow.on('resize', () => {
       this._resizeAllViews();
     });
+
+    // キオスク/フルスクリーン遷移完了時にViewをリサイズ
+    // ウィンドウ作成直後はまだ初期サイズ(1280x720)のため、
+    // 全画面化が完了してからリサイズし直す必要がある
+    this.mainWindow.on('enter-full-screen', () => {
+      this._resizeAllViews();
+    });
+
+    // フォールバック: 全画面イベントが発火しない環境用に遅延リサイズも実行
+    setTimeout(() => {
+      this._resizeAllViews();
+    }, 200);
 
     // オーバーレイの背景を透明に設定（loadFile の前に設定する必要がある）
     // loadFile の後に設定すると、デフォルトの不透明背景でレンダリングされてしまい
@@ -426,12 +444,20 @@ class ViewManager {
    */
   _resizeAllViews() {
     const bounds = this.mainWindow.getContentBounds();
-    const viewBounds = { x: 0, y: 0, width: bounds.width, height: bounds.height };
 
-    // 3つのViewすべてを同じサイズに設定
-    if (this.contentViewA) this.contentViewA.setBounds(viewBounds);
-    if (this.contentViewB) this.contentViewB.setBounds(viewBounds);
-    if (this.overlayView) this.overlayView.setBounds(viewBounds);
+    // ステータスバーの高さ（overlay.css の .status-bar height と一致させる）
+    const statusBarHeight = 32;
+
+    // コンテンツViewはステータスバー分だけ高さを縮める
+    // これによりコンテンツがステータスバーと被らなくなる
+    const contentBounds = { x: 0, y: 0, width: bounds.width, height: bounds.height - statusBarHeight };
+
+    // オーバーレイはフルスクリーン（ステータスバーとフェード効果を画面全体に表示するため）
+    const overlayBounds = { x: 0, y: 0, width: bounds.width, height: bounds.height };
+
+    if (this.contentViewA) this.contentViewA.setBounds(contentBounds);
+    if (this.contentViewB) this.contentViewB.setBounds(contentBounds);
+    if (this.overlayView) this.overlayView.setBounds(overlayBounds);
   }
 
   // =====================================================

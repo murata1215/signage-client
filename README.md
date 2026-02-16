@@ -24,6 +24,7 @@
   - サーバーからのスケジュール取得（version ベースの差分検知）
   - バックグラウンドポーリング（定期的なスケジュール更新チェック）
   - ハートビート定期送信（端末稼働監視用）
+  - スクリーンショット定期送信（5分間隔、管理画面ダッシュボード用サムネイル）
   - 初回セットアップ画面（サーバーURL・クライアントキー設定）
   - PDF コンテンツ表示（pdfjs-dist）
   - PDFファイルのローカルキャッシュ管理
@@ -31,6 +32,9 @@
   - オフラインフォールバック（サーバー到達不可時はキャッシュ利用）
   - コンテンツ先読み（次コンテンツの事前ロード）によるスムーズな切替
   - Chrome User-Agent 設定（ボット検知対策）
+  - 4Kディスプレイ自動スケーリング（起動スクリプトで解像度検出）
+  - キオスクモードでの全画面表示対応
+  - ステータスバーとコンテンツの重なり防止
 
 ### 📋 今後の予定
 
@@ -49,7 +53,7 @@
 |--------------|------|------|
 | ランタイム | Node.js 20 LTS | Ubuntu 24 対応 |
 | プレーヤー | Electron 33 | BrowserView 方式 |
-| PDF 表示 | pdfjs-dist 5.x | Mozilla PDF.js |
+| PDF 表示 | pdfjs-dist 4.x | Mozilla PDF.js（v5.x は Electron 33 非互換） |
 | バックエンド | Express.js | REST API（別リポジトリ: signage-server） |
 | データベース | SQLite3 | ファイルベース（サーバー側） |
 | 認証 | express-session + bcrypt | セッション認証（サーバー側） |
@@ -63,7 +67,8 @@ signage-client/
 ├── README.md                       # このファイル
 ├── CLAUDE.md                       # 開発ガイドライン
 ├── doc/
-│   └── signage-system-design.md    # システム設計ドキュメント（659行）
+│   ├── signage-system-design.md    # システム設計ドキュメント（659行）
+│   └── screenshot-client-spec.md   # スクリーンショット送信機能 仕様書
 ├── electron-player/                # Electron プレーヤー（メイン）
 │   ├── main.js                     # メインプロセス（起動フロー・IPC・ショートカット）
 │   ├── preload.js                  # IPC ブリッジ（contextBridge）
@@ -74,6 +79,7 @@ signage-client/
 │   │   ├── config-manager.js       # 設定ファイル管理（config.json）
 │   │   ├── cache-manager.js        # PDFキャッシュ管理
 │   │   ├── heartbeat.js            # ハートビート定期送信
+│   │   ├── screenshot.js           # スクリーンショット定期送信（管理画面サムネイル用）
 │   │   ├── playlist.js             # デフォルトプレイリスト（フォールバック用）
 │   │   └── proxy-rules.js          # プロキシ設定
 │   ├── renderer/
@@ -137,6 +143,8 @@ config.json 読み込み
   └── あり → 再生開始
         ↓
   ハートビート送信開始
+        ↓
+  スクリーンショット定期送信開始（初回30秒後、以後5分間隔）
         ↓
   スケジュール取得（サーバー → キャッシュ → デフォルト）
         ↓

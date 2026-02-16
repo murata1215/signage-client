@@ -44,6 +44,7 @@ const { getProxyConfig } = require('./lib/proxy-rules');
 const configManager = require('./lib/config-manager');
 const serverClient = require('./lib/server-client');
 const heartbeat = require('./lib/heartbeat');
+const screenshot = require('./lib/screenshot');
 const cacheManager = require('./lib/cache-manager');
 const ScheduleManager = require('./lib/schedule-manager');
 
@@ -215,6 +216,10 @@ async function startPlayback(config, fromSetup = false) {
     config.clientKey,
     (config.pollingIntervalSec || 60) * 1000
   );
+
+  // 2.5. スクリーンショット定期送信開始
+  // viewManager を渡して、その時点のアクティブViewを動的に参照する
+  screenshot.startScreenshotTimer(viewManager, config.serverUrl, config.clientKey);
 
   // 3. ScheduleManager を初期化してスケジュール取得
   scheduleManager = new ScheduleManager(config);
@@ -444,6 +449,9 @@ app.on('window-all-closed', () => {
 
   // ハートビート停止
   heartbeat.stopHeartbeat();
+
+  // スクリーンショット送信停止
+  screenshot.stopScreenshotTimer();
 
   // ポーリング停止
   if (scheduleManager) {
