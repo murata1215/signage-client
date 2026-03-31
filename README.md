@@ -44,7 +44,7 @@
   - [ ] ユーザー / 拠点 / 端末 / コンテンツ管理画面
   - [ ] スケジュール編集画面
 - [ ] **デプロイ**
-  - [ ] systemd サービス化（サーバー + クライアント）
+  - [x] systemd サービス化（サーバー: システムレベル / クライアント: ユーザーレベル）
   - [ ] セットアップスクリプト
 
 ## 技術スタック
@@ -57,7 +57,7 @@
 | バックエンド | Express.js | REST API（別リポジトリ: signage-server） |
 | データベース | SQLite3 | ファイルベース（サーバー側） |
 | 認証 | express-session + bcrypt | セッション認証（サーバー側） |
-| プロセス管理（予定） | systemd | OS 標準 |
+| プロセス管理 | systemd | クライアント: ユーザーサービス / サーバー: システムサービス |
 
 ## ディレクトリ構成
 
@@ -102,6 +102,7 @@ signage-client/
 │   ├── css/player.css
 │   └── js/player.js
 └── scripts/
+    ├── signage-client.service      # systemd ユーザーサービスファイル
     ├── proxy.pac                   # プロキシ自動設定（Chrome用）
     └── start-kiosk.sh              # Chrome キオスク起動（旧版）
 ```
@@ -173,6 +174,29 @@ npm start
 npm run start:kiosk
 ```
 
+## 本番デプロイ（自動起動）
+
+systemd ユーザーサービスで OS 起動時に自動起動する。
+詳細な手順は **[`doc/client-deploy.md`](doc/client-deploy.md)** を参照。
+
+```bash
+# サービスファイルを配置・有効化
+mkdir -p ~/.config/systemd/user
+cp scripts/signage-client.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable signage-client
+sudo loginctl enable-linger $(whoami)
+
+# サービス起動
+systemctl --user start signage-client
+
+# ステータス確認
+systemctl --user status signage-client
+
+# ログ確認
+journalctl --user -u signage-client -f
+```
+
 ## 操作方法
 
 | キー | 動作 | モード |
@@ -189,7 +213,11 @@ npm run start:kiosk
 4. 「接続テスト」で疎通確認
 5. 「保存して開始」で設定が `~/.config/signage-client/config.json` に保存され、再生が開始される
 
-## 設計ドキュメント
+## ドキュメント
 
-詳細なシステム設計は `doc/signage-system-design.md` を参照。
-DB スキーマ、全 API エンドポイント、画面仕様、デプロイ手順等を網羅。
+| ドキュメント | 内容 |
+|------------|------|
+| [`doc/signage-system-design.md`](doc/signage-system-design.md) | システム設計（DB・API・画面仕様） |
+| [`doc/client-deploy.md`](doc/client-deploy.md) | クライアントデプロイ手順書 |
+| [`doc/screenshot-client-spec.md`](doc/screenshot-client-spec.md) | スクリーンショット送信機能 仕様書 |
+| [`doc/changelog.md`](doc/changelog.md) | 変更履歴 |

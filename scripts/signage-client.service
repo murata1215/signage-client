@@ -1,0 +1,41 @@
+# ============================================================
+# signage-client systemd ユーザーサービスファイル
+# ============================================================
+# Electron ベースのサイネージプレーヤーを systemd ユーザーサービス
+# として管理する。GUI アプリのため、ユーザーレベルで動作させる。
+#
+# インストール方法:
+#   mkdir -p ~/.config/systemd/user
+#   cp scripts/signage-client.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable signage-client
+#   systemctl --user start signage-client
+#
+# Linger 有効化（ログイン前にサービス起動可能にする）:
+#   sudo loginctl enable-linger $(whoami)
+#
+# ログ確認:
+#   journalctl --user -u signage-client -f
+#
+# ステータス確認:
+#   systemctl --user status signage-client
+#
+# 再起動:
+#   systemctl --user restart signage-client
+# ============================================================
+
+[Unit]
+Description=Signage Client - Electron Player
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/tisa/signage-client
+Environment=DISPLAY=:0
+ExecStartPre=/bin/sleep 30
+ExecStart=/usr/bin/npm run start:kiosk
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
