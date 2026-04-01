@@ -453,9 +453,9 @@ app.on('window-all-closed', () => {
   // スクリーンショット送信停止
   screenshot.stopScreenshotTimer();
 
-  // ポーリング停止
+  // ポーリング + 時間帯チェックタイマー停止
   if (scheduleManager) {
-    scheduleManager.stopPolling();
+    scheduleManager.stopAll();
   }
 
   // ViewManager リソース解放

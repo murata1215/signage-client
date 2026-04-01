@@ -99,18 +99,38 @@ class ScheduleManager extends EventEmitter {
   }
 
   /**
-   * ポーリングと時間帯チェックを停止する
+   * ポーリングタイマーのみを停止する
+   *
+   * 注意: playTimeCheckTimer は停止しない。
+   * 両方停止したい場合は stopAll() を使用すること。
    */
   stopPolling() {
     if (this.pollingTimer) {
       clearInterval(this.pollingTimer);
       this.pollingTimer = null;
     }
+    console.log('[schedule] ポーリング停止');
+  }
+
+  /**
+   * 再生時間帯チェックタイマーを停止する
+   */
+  stopPlayTimeCheck() {
     if (this.playTimeCheckTimer) {
       clearInterval(this.playTimeCheckTimer);
       this.playTimeCheckTimer = null;
     }
-    console.log('[schedule] ポーリング停止');
+  }
+
+  /**
+   * 全タイマー（ポーリング + 再生時間帯チェック）を停止する
+   *
+   * アプリケーション終了時に使用する。
+   */
+  stopAll() {
+    this.stopPolling();
+    this.stopPlayTimeCheck();
+    console.log('[schedule] 全タイマー停止');
   }
 
   /**
@@ -163,9 +183,9 @@ class ScheduleManager extends EventEmitter {
     const currentPdfIds = pdfItems.map((item) => item.content_id);
     cacheManager.cleanupUnusedPdfs(currentPdfIds);
 
-    // 再生時間帯を更新
-    this.playStartTime = scheduleData.play_start_time;
-    this.playEndTime = scheduleData.play_end_time;
+    // 再生時間帯を更新し、チェックタイマーにも反映する
+    // サーバー側で再生時間帯が変更された場合、タイマーの参照値も即座に更新される
+    this.startPlayTimeCheck(scheduleData.play_start_time, scheduleData.play_end_time);
 
     // PlaylistItem[] に変換して schedule-updated イベントを emit
     const playlist = this.convertToPlaylistItems(scheduleData);

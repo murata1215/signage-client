@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-04-01
+
+### 再生時間帯チェックタイマーが停止するバグを修正
+
+- **原因**: `startPlayback()` で `startPlayTimeCheck()` → `startPolling()` の順に呼び出すが、`startPolling()` 内の `stopPolling()` が `playTimeCheckTimer` も一緒に消していた
+- **症状**: 再生時間帯外に起動すると、翌朝の再生開始時刻を過ぎても待機画面のまま
+- **修正**: `stopPolling()` からタイマー停止の責務を分離
+  - `stopPolling()` → ポーリングタイマーのみ停止
+  - `stopPlayTimeCheck()` を新設
+  - `stopAll()` を新設（終了処理用）
+  - `pollOnce()` で version 変更時に `startPlayTimeCheck()` を再呼出し
+
 ## 2026-03-31
 
 ### クライアント自動起動のドキュメント化
