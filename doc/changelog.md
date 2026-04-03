@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-04-03
+
+### systemd サービスに XAUTHORITY 環境変数を追加
+
+- **原因**: systemd 経由で起動すると XAUTHORITY が未設定のため、起動スクリプトの `xset s off` 等が X サーバーに接続できずサイレントに失敗（`2>/dev/null` でエラーが隠れていた）
+- **症状**: 10分でスクリーンセーバーが画面をブランク（真っ黒）にする
+- **修正**: `scripts/signage-client.service` に `Environment=XAUTHORITY=/home/tisa/.Xauthority` を追加
+- `doc/client-deploy.md` に XAUTHORITY の説明を追記
+
 ## 2026-04-01
 
 ### 再生時間帯チェックタイマーが停止するバグを修正

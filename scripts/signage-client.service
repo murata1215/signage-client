@@ -32,6 +32,7 @@ After=graphical-session.target
 Type=simple
 WorkingDirectory=/home/tisa/signage-client
 Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/tisa/.Xauthority
 ExecStartPre=/bin/sleep 30
 ExecStart=/usr/bin/npm run start:kiosk
 Restart=on-failure

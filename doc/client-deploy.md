@@ -124,6 +124,7 @@ After=graphical-session.target
 Type=simple
 WorkingDirectory=/home/tisa/signage-client
 Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/tisa/.Xauthority
 ExecStartPre=/bin/sleep 30
 ExecStart=/usr/bin/npm run start:kiosk
 Restart=on-failure
@@ -137,10 +138,14 @@ WantedBy=default.target
 |------|------|
 | `After=graphical-session.target` | GUI セッション起動後に開始 |
 | `Environment=DISPLAY=:0` | X11 ディスプレイを指定 |
+| `Environment=XAUTHORITY=...` | X11 認証情報（xset コマンドに必要） |
 | `ExecStartPre=/bin/sleep 30` | GUI が安定するまで30秒待機 |
 | `ExecStart` | キオスクモードで Electron を起動 |
 | `Restart=on-failure` | クラッシュ時に自動再起動 |
 | `RestartSec=10` | 再起動まで10秒待機 |
+
+> **重要**: `XAUTHORITY` がないと起動スクリプト内の `xset s off` 等が X サーバーに接続できず、
+> スクリーンセーバーが無効化されない（10分で画面が真っ黒になる）。
 
 ---
 
