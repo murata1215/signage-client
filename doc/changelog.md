@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+### ディスプレイ省電力の完全無効化
+
+- systemd サービスに `ExecStartPre` で `xset s off / s noblank / -dpms` を追加（再起動時も自動適用）
+- GNOME 省電力設定（idle-delay, screensaver, suspend）を全無効化（gsettings、永続化）
+- xscreensaver / light-locker の自動起動を無効化
+- `doc/disable-display-powersave.md` を追加（手順書）
+
 ### プレイリスト更新の即時反映
 
 - **変更前**: スケジュール更新時、古いプレイリストのローテーション末尾（最大40分後）まで待って差し替え

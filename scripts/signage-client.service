@@ -34,6 +34,9 @@ WorkingDirectory=/home/tisa/signage-client
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/tisa/.Xauthority
 ExecStartPre=/bin/sleep 30
+ExecStartPre=/usr/bin/xset s off
+ExecStartPre=/usr/bin/xset s noblank
+ExecStartPre=/usr/bin/xset -dpms
 ExecStart=/usr/bin/npm run start:kiosk
 Restart=on-failure
 RestartSec=10

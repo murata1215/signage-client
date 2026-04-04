@@ -126,6 +126,9 @@ WorkingDirectory=/home/tisa/signage-client
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/tisa/.Xauthority
 ExecStartPre=/bin/sleep 30
+ExecStartPre=/usr/bin/xset s off
+ExecStartPre=/usr/bin/xset s noblank
+ExecStartPre=/usr/bin/xset -dpms
 ExecStart=/usr/bin/npm run start:kiosk
 Restart=on-failure
 RestartSec=10
@@ -140,12 +143,13 @@ WantedBy=default.target
 | `Environment=DISPLAY=:0` | X11 ディスプレイを指定 |
 | `Environment=XAUTHORITY=...` | X11 認証情報（xset コマンドに必要） |
 | `ExecStartPre=/bin/sleep 30` | GUI が安定するまで30秒待機 |
+| `ExecStartPre=xset ...` | スクリーンセーバー/DPMS を無効化 |
 | `ExecStart` | キオスクモードで Electron を起動 |
 | `Restart=on-failure` | クラッシュ時に自動再起動 |
 | `RestartSec=10` | 再起動まで10秒待機 |
 
-> **重要**: `XAUTHORITY` がないと起動スクリプト内の `xset s off` 等が X サーバーに接続できず、
-> スクリーンセーバーが無効化されない（10分で画面が真っ黒になる）。
+> **重要**: `XAUTHORITY` がないと `xset` が X サーバーに接続できず、スクリーンセーバーが無効化されない。
+> 初回セットアップ時は `doc/disable-display-powersave.md` の手順も実行すること（gsettings 等の永続設定）。
 
 ---
 
