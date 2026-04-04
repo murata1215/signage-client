@@ -126,6 +126,7 @@ WorkingDirectory=/home/tisa/signage-client
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/tisa/.Xauthority
 ExecStartPre=/bin/sleep 30
+ExecStartPre=-/usr/bin/killall xfce4-power-manager
 ExecStartPre=/usr/bin/xset s off
 ExecStartPre=/usr/bin/xset s noblank
 ExecStartPre=/usr/bin/xset -dpms

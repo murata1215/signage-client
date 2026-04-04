@@ -62,7 +62,24 @@ cp /etc/xdg/autostart/light-locker.desktop ~/.config/autostart/light-locker.desk
 echo "Hidden=true" >> ~/.config/autostart/light-locker.desktop
 ```
 
-## 5. systemd サービスでの xset 自動実行
+## 5. xfce4-power-manager の無効化
+
+`xfce4-power-manager` は xset の設定を定期的に上書きする（`blank-on-ac` の値で `timeout` を再設定する）。
+kill しても XFCE セッション起動時に自動で復活するため、自動起動を無効化する。
+
+```bash
+# プロセスを kill
+killall xfce4-power-manager
+
+# 自動起動を無効化
+cp /etc/xdg/autostart/xfce4-power-manager.desktop ~/.config/autostart/xfce4-power-manager.desktop
+echo "Hidden=true" >> ~/.config/autostart/xfce4-power-manager.desktop
+```
+
+> xfce4-power-manager を残したまま xset s off しても、数分後に timeout が元に戻されるため、
+> 必ず kill + 自動起動無効化を行うこと。
+
+## 6. systemd サービスでの xset 自動実行
 
 `~/.config/systemd/user/signage-client.service` の `[Service]` セクション:
 
@@ -73,6 +90,7 @@ WorkingDirectory=/home/tisa/signage-client
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/tisa/.Xauthority
 ExecStartPre=/bin/sleep 30
+ExecStartPre=-/usr/bin/killall xfce4-power-manager
 ExecStartPre=/usr/bin/xset s off
 ExecStartPre=/usr/bin/xset s noblank
 ExecStartPre=/usr/bin/xset -dpms
@@ -80,6 +98,9 @@ ExecStart=/usr/bin/npm run start:kiosk
 Restart=on-failure
 RestartSec=10
 ```
+
+> `ExecStartPre=-` の `-` プレフィックスは、コマンドが失敗しても（プロセスが存在しない場合など）
+> サービス起動を継続することを意味する。
 
 サービスファイル更新後:
 ```bash

@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+### xfce4-power-manager 対策を追加
+
+- **原因**: `xfce4-power-manager` が xset の設定を定期的に上書きし、`timeout: 600`（10分）に戻していた
+- **修正**: systemd サービスの ExecStartPre に `killall xfce4-power-manager` を追加
+- xfce4-power-manager の自動起動を `Hidden=true` で無効化
+- `doc/disable-display-powersave.md` に手順を追記
+
 ### ディスプレイ省電力の完全無効化
 
 - systemd サービスに `ExecStartPre` で `xset s off / s noblank / -dpms` を追加（再起動時も自動適用）
