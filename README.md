@@ -219,5 +219,6 @@ journalctl --user -u signage-client -f
 |------------|------|
 | [`doc/signage-system-design.md`](doc/signage-system-design.md) | システム設計（DB・API・画面仕様） |
 | [`doc/client-deploy.md`](doc/client-deploy.md) | クライアントデプロイ手順書 |
+| [`doc/disable-display-powersave.md`](doc/disable-display-powersave.md) | ディスプレイ省電力無効化手順 |
 | [`doc/screenshot-client-spec.md`](doc/screenshot-client-spec.md) | スクリーンショット送信機能 仕様書 |
 | [`doc/changelog.md`](doc/changelog.md) | 変更履歴 |
