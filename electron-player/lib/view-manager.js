@@ -338,12 +338,14 @@ class ViewManager {
     // インデックスを進める
     this.currentIndex = (this.currentIndex + 1) % this.playlist.length;
 
-    // プレイリスト末尾に到達した場合、保留中の新プレイリストに差し替え
-    // 再生中のコンテンツが途中で消えることを防ぐため、ループ境界で切り替える
-    if (this.currentIndex === 0 && this.pendingPlaylist) {
+    // 保留中の新プレイリストがあれば即座に差し替える
+    // 現在表示中のコンテンツの再生完了後（フェード完了時）に切り替わるため、
+    // 再生中のコンテンツが途中で途切れることはない
+    if (this.pendingPlaylist) {
       console.log(`[ViewManager] プレイリスト差し替え: ${this.playlist.length}件 → ${this.pendingPlaylist.length}件`);
       this.playlist = this.pendingPlaylist;
       this.pendingPlaylist = null;
+      this.currentIndex = 0;
     }
 
     // View のアクティブ/スタンバイを入れ替え
