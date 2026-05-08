@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-05-08
+
+### プロキシバイパスに社内ドメインを追加
+
+- `proxy-rules.js` の `BYPASS_RULES` に `*.atg.co.jp` を追加
+- **原因**: `service.internal.atg.co.jp` は IP が `10.x.x.x` だが、Electron は DNS 解決前にプロキシルールを評価するためドメイン名でのバイパス指定が必要
+- 2号機で先行修正済み、1号機にも適用
+
 ## 2026-04-04
 
 ### xfce4-power-manager 対策を追加
